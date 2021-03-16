@@ -58,6 +58,8 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 
 app.post('/urls/:shortURL/update', (req, res) => {
   const shortURL = req.params.shortURL;
+  urlDatabase[shortURL] = req.body.urlupdate; // make the property value of the short URL be the updated long URL.
+  res.redirect(`/urls/${shortURL}`);
 });
 
 //deletes a shortURl - longURL pair from urlDatabase

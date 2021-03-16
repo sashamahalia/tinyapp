@@ -21,8 +21,8 @@
         <h5 class="card-title">Edit</h5>
         <form id="update" method="POST" action="/urls/<%= shortURL %>/update/">
         <label for="urlupdate">New Url:</label>
-        <input id="urlupdate" type="text" value="<%= longURL %>">
-        <button type="submit" form="update" value="Submit">Submit</button>
+        <input name="urlupdate" type="text" value="<%= longURL %>">
+        <button class="btn btn-primary" type="submit" form="update" value="Submit">Submit</button>
       </form>
       </div>
     </div>
