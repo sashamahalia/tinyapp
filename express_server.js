@@ -4,6 +4,19 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 const PORT = 8080; //default port 8080
 
+const getRandomChar = (string) => {
+  return Math.floor(Math.random() * string.length);
+};
+
+const generateRandomString = (callback) => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789';
+  let randomString = '';
+  for (let i = 0; i < 6; i++) {
+    randomString += chars[callback(chars)];
+  }
+  return randomString;
+}; // apapted from https://www.coderrocketfuel.com/article/generate-a-random-letter-from-the-alphabet-using-javascript
+
 app.set('view engine', 'ejs');
 
 const urlDatabase = {
@@ -15,6 +28,20 @@ const urlDatabase = {
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
+});
+
+app.post("/urls", (req, res) => {
+  console.log(req.body);  // Log the POST request body to the console
+  const shortURL = generateRandomString(getRandomChar)
+  urlDatabase[shortURL] = req.body.longURL;
+  console.log(urlDatabase);
+  // res.send('ok');
+  // for (const key in urlDatabase) {
+  //   if (key === shortURL) {
+      
+  //   }
+  // }
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.get('/urls/new', (req, res) => {
