@@ -47,12 +47,21 @@ app.get('/u/:shortURL', (req, res) => {
   res.redirect(longURl);
 });
 
+
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(getRandomChar);
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/urls/${shortURL}`);
 });
 
+//sets cookie on username
+app.post('/login', (req, res) => {
+  const username = req.body.username;
+  res.cookie('username', username);
+  res.redirect('/urls');
+});
+
+//redirects to page where the long URL can be updated
 app.post('/urls/:shortURL/edit', (req, res) => {
   const shortURL = req.params.shortURL;
   res.redirect(`/urls/${shortURL}`);
