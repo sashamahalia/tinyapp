@@ -84,12 +84,23 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-// //sets cookie on username
-// app.post('/login', (req, res) => {
-//   const username = req.body.username;
-//   res.cookie('username', username);
-//   res.redirect('/urls');
-// });
+//sets cookie on user_id
+app.post('/login', (req, res) => {
+  if (validator('email', req.body)) { //validator returns true if email doesn't match an email in the user object
+    console.log('email not found 403');
+    return;
+  }
+  if (validator('password', req.body)) { // validator returns true if password doesn't match a password in the user object
+    console.log('passwords don\'t match403');
+    return;
+  }
+  const email = req.body.email;
+  const password = req.body.password;
+  const id = generateRandomString(getRandomChar);
+  users[id] = { id, email, password };
+  res.cookie('user_id', users[id]);
+  res.redirect('/urls');
+});
 
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
@@ -103,11 +114,6 @@ app.post('/register', (req, res) => {
     res.render('urls_register', templateVars);
     return;
   }
-  // if (!validator('email', req.body)) {
-  //   const templateVars = {user: req.cookies['user_id'], valid: false };
-  //   res.render('urls_register', templateVars);
-  //   return;
-  // }
   if (validator('email', req.body)) {
     const email = req.body.email;
     const password = req.body.password;
