@@ -33,7 +33,6 @@ const users = {
 
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
-  console.log(templateVars.username);
   res.render('urls_index', templateVars);
 });
 
@@ -79,13 +78,15 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
+// updates users object
 app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  console.log('before', users);
   const id = generateRandomString(getRandomChar);
   users[id] = { id, email, password };
-  console.log('after', users);
+  console.log(users[id]);
+  res.cookie('user_id', users[id]);
+  res.redirect('/urls');
 })
 
 //redirects to page where the long URL can be updated
