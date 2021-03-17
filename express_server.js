@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 const app = express();
+app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 const PORT = 8080; //default port 8080
@@ -19,8 +20,6 @@ const generateRandomString = (callback) => {
   return randomString;
 }; // apapted from https://www.coderrocketfuel.com/article/generate-a-random-letter-from-the-alphabet-using-javascript
 
-app.set('view engine', 'ejs');
-
 const urlDatabase = {
   // "b2xVn2": "http://www.lighthouselabs.ca",
   // "9sm5xK": "http://www.google.com"
@@ -29,7 +28,6 @@ const urlDatabase = {
 
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
-  console.log(templateVars.username);
   res.render('urls_index', templateVars);
 });
 
@@ -56,6 +54,10 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(getRandomChar);
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/urls/${shortURL}`);
+});
+
+app.get('/register', (req, res) => {
+  res.render('urls_register')
 });
 
 //sets cookie on username
@@ -85,7 +87,9 @@ app.post('/urls/:shortURL/update', (req, res) => {
 //deletes a shortURl - longURL pair from urlDatabase
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
+  console.log('before', urlDatabase[shortURL]);
   delete urlDatabase[shortURL];
+  console.log('after', urlDatabase[shortURL]);
   res.redirect('/urls');
 });
 
