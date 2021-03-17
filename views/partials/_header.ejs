@@ -15,5 +15,8 @@
       <input id="username" name="username">
       <button class="btn btn-primary" type="submit" value="Submit">Sign In</button>
     </form>
+    <% if (username !== undefined) { %>
+      <h3 class="navbar-brand"><%= username %></h2>
+    <% } %>  
   </nav>
 </header>
