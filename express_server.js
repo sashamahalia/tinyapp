@@ -29,15 +29,16 @@ const urlDatabase = {
 
 const users = {
 
- }
+};
 
 app.get('/urls', (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  const templateVars = { urls: urlDatabase, user: req.cookies['user_id']};
+  console.log('cookie user', templateVars.user);
   res.render('urls_index', templateVars);
 });
 
 app.get('/urls/new', (req, res) => {
-  const templateVars = { username: req.cookies["username"] };
+  const templateVars = { user: req.cookies['user_id'] };
   res.render("urls_new", templateVars);
 });
 
@@ -45,7 +46,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"] };
+    user: req.cookies['user_id'] };
   res.render("urls_show", templateVars);
 });
 
@@ -56,7 +57,7 @@ app.get('/u/:shortURL', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  const templateVars = { username: req.cookies["username"] };
+  const templateVars = { user: req.cookies['user_id'] };
   res.render('urls_register', templateVars);
 });
 
@@ -84,10 +85,9 @@ app.post('/register', (req, res) => {
   const password = req.body.password;
   const id = generateRandomString(getRandomChar);
   users[id] = { id, email, password };
-  console.log(users[id]);
   res.cookie('user_id', users[id]);
   res.redirect('/urls');
-})
+});
 
 //redirects to page where the long URL can be updated
 app.post('/urls/:shortURL/edit', (req, res) => {
