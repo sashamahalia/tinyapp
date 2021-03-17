@@ -10,13 +10,13 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-    <% if (user.email !== undefined) { %>
+    <% if (user) { %>
       <h3 class="navbar-brand">Logged in as: <%= user.email %></h2>
       <form method="POST" action="/logout">
         <button class="btn btn-primary" type="submit" value="Submit">Log Out</button>
       </form>
     <% } %>  
-    <% if (user.email === undefined) { %>
+    <% if (!user) { %>
       <form method="POST" action="/login">
         <input id="username" name="username" placeholder="Username">
         <button class="btn btn-primary" type="submit" value="Submit">Sign In</button>

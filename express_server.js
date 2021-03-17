@@ -6,6 +6,20 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 const PORT = 8080; //default port 8080
 
+app.set('view engine', 'ejs');
+
+const urlDatabase = {
+  // "b2xVn2": "http://www.lighthouselabs.ca",
+  // "9sm5xK": "http://www.google.com"
+  
+};
+
+const users = {
+
+};
+
+//functions
+
 const getRandomChar = (string) => {
   return Math.floor(Math.random() * string.length);
 };
@@ -19,21 +33,19 @@ const generateRandomString = (callback) => {
   return randomString;
 }; // apapted from https://www.coderrocketfuel.com/article/generate-a-random-letter-from-the-alphabet-using-javascript
 
-app.set('view engine', 'ejs');
+// const getUserByEmail = (reqBody)
 
-const urlDatabase = {
-  // "b2xVn2": "http://www.lighthouselabs.ca",
-  // "9sm5xK": "http://www.google.com"
-  
-};
-
-const users = {
-
+const validator = (userProperty, reqBody) => { //userProperty should be a property of the reqBody object, ie id or email, reqBody is the req.body object returned from form submission.
+  for (const user in users) {
+    if (reqBody[userProperty] === users[user][userProperty]) {
+      return false;
+    }
+  }
+  return true;
 };
 
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase, user: req.cookies['user_id']};
-  console.log('cookie user', templateVars.user);
   res.render('urls_index', templateVars);
 });
 
@@ -57,7 +69,7 @@ app.get('/u/:shortURL', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  const templateVars = { user: req.cookies['user_id'] };
+  const templateVars = { user: req.cookies['user_id'], valid: true};
   res.render('urls_register', templateVars);
 });
 
@@ -67,26 +79,38 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-//sets cookie on username
-app.post('/login', (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username);
-  res.redirect('/urls');
-});
+// //sets cookie on username
+// app.post('/login', (req, res) => {
+//   const username = req.body.username;
+//   res.cookie('username', username);
+//   res.redirect('/urls');
+// });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
-// updates users object
+// updates users object if email and password aren't empty strings, and email doesn't already exist in users object
 app.post('/register', (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  const id = generateRandomString(getRandomChar);
-  users[id] = { id, email, password };
-  res.cookie('user_id', users[id]);
-  res.redirect('/urls');
+  if (!req.body['email'] || !req.body['password'] || !validator('email', req.body)) {
+    const templateVars = {user: req.cookies['user_id'], valid: false };
+    res.render('urls_register', templateVars);
+    return;
+  }
+  // if (!validator('email', req.body)) {
+  //   const templateVars = {user: req.cookies['user_id'], valid: false };
+  //   res.render('urls_register', templateVars);
+  //   return;
+  // }
+  if (validator('email', req.body)) {
+    const email = req.body.email;
+    const password = req.body.password;
+    const id = generateRandomString(getRandomChar);
+    users[id] = { id, email, password };
+    res.cookie('user_id', users[id]);
+    res.redirect('/urls');
+  }
 });
 
 //redirects to page where the long URL can be updated
