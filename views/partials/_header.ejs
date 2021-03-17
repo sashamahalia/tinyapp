@@ -11,15 +11,14 @@
       </div>
     </div>
     <% if (username !== undefined) { %>
-      <h3 class="navbar-brand"><%= username %></h2>
+      <h3 class="navbar-brand">Logged in as: <%= username %></h2>
       <form method="POST" action="/logout">
         <button class="btn btn-primary" type="submit" value="Submit">Log Out</button>
       </form>
     <% } %>  
     <% if (username === undefined) { %>
       <form method="POST" action="/login">
-        <label for="username">Username:</label>
-        <input id="username" name="username">
+        <input id="username" name="username" placeholder="Username">
         <button class="btn btn-primary" type="submit" value="Submit">Sign In</button>
       </form>
     <% } %>  
