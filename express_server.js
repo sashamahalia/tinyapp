@@ -87,11 +87,11 @@ app.post("/urls", (req, res) => {
 //sets cookie on user_id
 app.post('/login', (req, res) => {
   if (validator('email', req.body)) { //validator returns true if email doesn't match an email in the user object
-    console.log('email not found 403');
+    res.sendStatus(403);
     return;
   }
   if (validator('password', req.body)) { // validator returns true if password doesn't match a password in the user object
-    console.log('passwords don\'t match403');
+    res.sendStatus(403);
     return;
   }
   const email = req.body.email;
