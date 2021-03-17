@@ -65,6 +65,11 @@ app.post('/login', (req, res) => {
   res.redirect('/urls');
 });
 
+app.post('/logout', (req, res) => {
+  res.clearCookie('username');
+  res.redirect('/urls');
+});
+
 //redirects to page where the long URL can be updated
 app.post('/urls/:shortURL/edit', (req, res) => {
   const shortURL = req.params.shortURL;
