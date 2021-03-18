@@ -10,9 +10,7 @@ const PORT = 8080; //default port 8080
 app.set('view engine', 'ejs');
 
 const urlDatabase = {
-  // "b2xVn2": "http://www.lighthouselabs.ca",
-  // "9sm5xK": "http://www.google.com"
-  
+
 };
 
 const users = {
@@ -62,7 +60,6 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]['longURL'],
     user: req.cookies['user_id'] };
-    console.log('long url', urlDatabase[req.params.shortURL]['longURL']);
   res.render("urls_show", templateVars);
 });
 
@@ -84,7 +81,7 @@ app.get('/login', (req, res) => {
 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(getRandomChar);
-  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.cookies['user_id']['id'] }
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.cookies['user_id']['id'] }; //adds shortURL as the property, the property value is an object with the long url and userID
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -137,7 +134,7 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 
 app.post('/urls/:shortURL/update', (req, res) => {
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.urlupdate; // make the property value of the short URL be the updated long URL.
+  urlDatabase[shortURL]['longURL'] = req.body.urlupdate; // make the longURL value of the short URL be the updated long URL.
   res.redirect(`/urls/${shortURL}`);
 });
 
