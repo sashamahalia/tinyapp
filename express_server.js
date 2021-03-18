@@ -41,8 +41,21 @@ const validator = (userProperty, reqBody) => { //userProperty should be a proper
   return true;
 };
 
+const urlsForUser = (id) => {
+  for (url in urlDatabase) {
+    console.log('user id inside function', urlDatabase[url]['userID']);
+    if (urlDatabase[url]['userID'] === id) {
+      return 
+    }
+  }
+};
+
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase, user: req.cookies['user_id']};
+  if (templateVars.user) {
+  console.log('user id:', templateVars.user['id']);
+  console.log(urlsForUser(templateVars.user));
+  }
   res.render('urls_index', templateVars);
 });
 
