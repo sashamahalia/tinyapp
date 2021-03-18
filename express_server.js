@@ -60,8 +60,9 @@ app.get('/urls/new', (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL]['longURL'],
     user: req.cookies['user_id'] };
+    console.log('long url', urlDatabase[req.params.shortURL]['longURL']);
   res.render("urls_show", templateVars);
 });
 
@@ -72,7 +73,7 @@ app.get('/u/:shortURL', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  const templateVars = { user: req.cookies['user_id'], valid: true};
+  const templateVars = { user: req.cookies['user_id'], valid: true}; //assumes user info is valid until it is submitted and checked
   res.render('urls_register', templateVars);
 });
 
@@ -83,7 +84,7 @@ app.get('/login', (req, res) => {
 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(getRandomChar);
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.cookies['user_id']['id'] }
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -143,9 +144,7 @@ app.post('/urls/:shortURL/update', (req, res) => {
 //deletes a shortURl - longURL pair from urlDatabase
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
-  console.log('before', urlDatabase[shortURL]);
   delete urlDatabase[shortURL];
-  console.log('after', urlDatabase[shortURL]);
   res.redirect('/urls');
 });
 
