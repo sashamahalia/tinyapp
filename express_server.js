@@ -1,11 +1,12 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
+const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 const app = express();
 app.set('view engine', 'ejs');
 const PORT = 8080; //default port 8080
 
 //Middleware
-const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
@@ -39,6 +40,14 @@ const validator = (userProperty, reqBody) => { //userProperty should be a proper
     }
   }
   return true;
+};
+
+const getUserByEmail = (email) => {
+  for (const user in users) {
+    if (email === users[user]['email']) {
+      return users[user]['id'];
+    }
+  }
 };
 
 const urlsForUser = (id) => {
@@ -84,7 +93,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //redirects to long url when given shortURl
 app.get('/u/:shortURL', (req, res) => {
-  const shortURL =req.params.shortURL;
+  const shortURL = req.params.shortURL;
   const longURl = urlDatabase[shortURL]['longURL'];
   res.redirect(longURl);
 });
@@ -109,19 +118,16 @@ app.post("/urls", (req, res) => {
 
 //sets cookie on user_id
 app.post('/login', (req, res) => {
-  if (validator('email', req.body)) { //validator returns true if email doesn't match an email in the user object
+  if (req.body.email && validator('email', req.body)) { //validator returns true if email doesn't match an email in the user object
     res.sendStatus(403);
     return;
   }
-  //refactor to one line if differention isn't needed
-  if (validator('password', req.body)) { // validator returns true if password doesn't match a password in the user object
+  const id = getUserByEmail(req.body.email);
+  const password = users[id]['password'];
+  if (req.body.password && !bcrypt.compareSync(req.body.password, password)) {
     res.sendStatus(403);
     return;
   }
-  const email = req.body.email;
-  const password = req.body.password;
-  const id = generateRandomString(getRandomChar);
-  users[id] = { id, email, password };
   res.cookie('user_id', users[id]);
   res.redirect('/urls');
 });
@@ -140,8 +146,8 @@ app.post('/register', (req, res) => {
   }
   if (validator('email', req.body)) {
     const email = req.body.email;
-    const password = req.body.password;
     const id = generateRandomString(getRandomChar);
+    const password = bcrypt.hashSync(req.body.password, 10);
     users[id] = { id, email, password };
     res.cookie('user_id', users[id]);
     res.redirect('/urls');
@@ -164,7 +170,7 @@ app.post('/urls/:shortURL/update', (req, res) => {
     return;
   }
   urlDatabase[vars.shortURL]['longURL'] = req.body.urlupdate; // make the longURL value of the short URL be the updated long URL.
-  res.redirect(`/urls/${shortURL}`);
+  res.redirect(`/urls/${vars.shortURL}`);
 });
 
 //deletes a shortURl - longURL pair from urlDatabase
