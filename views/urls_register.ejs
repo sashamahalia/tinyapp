@@ -15,13 +15,20 @@
   <main>
     <div class="card text-center">
       <div class="card-body">
-        <h1 class="card-title">Sign up for a new TinyURL account!</h1>
+        <h1 class="card-title">Sign up</h1>
         <% if (!valid) { %>
           <p>Status 400: Invalid email or password, please try again</p>
         <% } %>
         <form id="register" method="POST" action="/register">
-          <input type="email" placeholder="email@emailhost.com" name=email>
+          <label for="email">Enter Email</label>
+          <br>
+          <input type="email" placeholder="Enter email" name=email>
+          <br>
+          <label for="password">Password</label>
+          <br>
           <input type="password" placeholder="password" name="password">
+          <br>
+          <br>
           <button type="submit" value="submit" class="btn btn-primary">Register</button>
         </form>
     </div>

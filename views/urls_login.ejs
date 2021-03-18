@@ -16,10 +16,17 @@
   <main>
     <div class="card text-center">
       <div class="card-body">
-        <h1 class="card-title">Log in to your TinyURL account!</h1>
+        <h1 class="card-title">Login</h1>
         <form id="login" method="POST" action="/login">
-          <input type="email" placeholder="email@emailhost.com" name=email>
+          <label for="email">Email Address</label>
+          <br>
+          <input type="email" placeholder="Enter email" name=email>
+          <br>
+          <label for="password">Password</label>
+          <br>
           <input type="password" placeholder="password" name="password">
+          <br>
+          <br>
           <button type="submit" value="submit" class="btn btn-primary">Log In</button>
         </form>
     </div>

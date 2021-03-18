@@ -90,6 +90,7 @@ app.post('/login', (req, res) => {
     res.sendStatus(403);
     return;
   }
+  //refactor to one line if differention isn't needed
   if (validator('password', req.body)) { // validator returns true if password doesn't match a password in the user object
     res.sendStatus(403);
     return;
