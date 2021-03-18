@@ -1,13 +1,13 @@
 const express = require('express');
-const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser');
 const app = express();
 app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
 const PORT = 8080; //default port 8080
 
-app.set('view engine', 'ejs');
+//Middleware
+const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 const urlDatabase = {
 
@@ -17,7 +17,7 @@ const users = {
 
 };
 
-//functions
+//Functions
 
 const getRandomChar = (string) => {
   return Math.floor(Math.random() * string.length);
@@ -42,19 +42,21 @@ const validator = (userProperty, reqBody) => { //userProperty should be a proper
 };
 
 const urlsForUser = (id) => {
-  for (url in urlDatabase) {
-    console.log('user id inside function', urlDatabase[url]['userID']);
-    if (urlDatabase[url]['userID'] === id) {
-      return 
+  const match = {};
+  for (const url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      match[url] = urlDatabase[url];
     }
   }
+  return match;
 };
+
+//Get routes
 
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase, user: req.cookies['user_id']};
   if (templateVars.user) {
-  console.log('user id:', templateVars.user['id']);
-  console.log(urlsForUser(templateVars.user));
+    templateVars.urls = urlsForUser(templateVars.user['id']); // returns urls that match user id
   }
   res.render('urls_index', templateVars);
 });
@@ -92,6 +94,8 @@ app.get('/login', (req, res) => {
   const templateVars = { user: req.cookies['user_id']};
   res.render('urls_login', templateVars);
 });
+
+//Post routes
 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString(getRandomChar);
