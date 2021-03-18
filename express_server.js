@@ -34,16 +34,6 @@ const generateRandomString = (callback) => {
   return randomString;
 }; // apapted from https://www.coderrocketfuel.com/article/generate-a-random-letter-from-the-alphabet-using-javascript
 
-<<<<<<< HEAD
-const urlDatabase = {
-  // "b2xVn2": "http://www.lighthouselabs.ca",
-  // "9sm5xK": "http://www.google.com"
-  
-};
-
-app.get('/urls', (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
-=======
 // const getUserByEmail = (reqBody)
 
 const validator = (userProperty, reqBody) => { //userProperty should be a property of the reqBody object, ie id or email, reqBody is the req.body object returned from form submission.
@@ -57,7 +47,6 @@ const validator = (userProperty, reqBody) => { //userProperty should be a proper
 
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase, user: req.cookies['user_id']};
->>>>>>> feature/user-registration
   res.render('urls_index', templateVars);
 });
 
@@ -96,15 +85,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-<<<<<<< HEAD
-app.get('/register', (req, res) => {
-  res.render('urls_register')
-});
-
-//sets cookie on username
-=======
 //sets cookie on user_id
->>>>>>> feature/user-registration
 app.post('/login', (req, res) => {
   if (validator('email', req.body)) { //validator returns true if email doesn't match an email in the user object
     res.sendStatus(403);
