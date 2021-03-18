@@ -34,8 +34,6 @@ const generateRandomString = (callback) => {
   return randomString;
 }; // apapted from https://www.coderrocketfuel.com/article/generate-a-random-letter-from-the-alphabet-using-javascript
 
-// const getUserByEmail = (reqBody)
-
 const validator = (userProperty, reqBody) => { //userProperty should be a property of the reqBody object, ie id or email, reqBody is the req.body object returned from form submission.
   for (const user in users) {
     if (reqBody[userProperty] === users[user][userProperty]) {
@@ -52,7 +50,11 @@ app.get('/urls', (req, res) => {
 
 app.get('/urls/new', (req, res) => {
   const templateVars = { user: req.cookies['user_id'] };
-  res.render("urls_new", templateVars);
+  if (!templateVars.user) {
+    res.redirect('/login');
+    return;
+  }
+  res.render('urls_new', templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
