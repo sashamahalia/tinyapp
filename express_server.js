@@ -73,8 +73,12 @@ app.get('/urls/new', (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL]['longURL'],
+    longURL: urlDatabase[req.params.shortURL] && urlDatabase[req.params.shortURL]['longURL'],
     user: req.cookies['user_id'] };
+  if (!templateVars.user || !(urlsForUser(templateVars.user['id'])[templateVars.shortURL])) {
+    res.redirect('/login');
+    return;
+  }
   res.render("urls_show", templateVars);
 });
 
@@ -151,15 +155,29 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 });
 
 app.post('/urls/:shortURL/update', (req, res) => {
-  const shortURL = req.params.shortURL;
-  urlDatabase[shortURL]['longURL'] = req.body.urlupdate; // make the longURL value of the short URL be the updated long URL.
+  const vars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL] && urlDatabase[req.params.shortURL]['longURL'],
+    user: req.cookies['user_id'] };
+  if (!vars.user || !(urlsForUser(vars.user['id'])[vars.shortURL])) {
+    res.redirect('/login');
+    return;
+  }
+  urlDatabase[vars.shortURL]['longURL'] = req.body.urlupdate; // make the longURL value of the short URL be the updated long URL.
   res.redirect(`/urls/${shortURL}`);
 });
 
 //deletes a shortURl - longURL pair from urlDatabase
 app.post('/urls/:shortURL/delete', (req, res) => {
-  const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
+  const vars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL] && urlDatabase[req.params.shortURL]['longURL'],
+    user: req.cookies['user_id'] };
+  if (!vars.user || !(urlsForUser(vars.user['id'])[vars.shortURL])) {
+    res.redirect('/login');
+    return;
+  }
+  delete urlDatabase[vars.shortURL];
   res.redirect('/urls');
 });
 
