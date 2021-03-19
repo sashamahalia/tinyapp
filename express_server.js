@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
+const { getRandomChar, generateRandomString, validator, getUserByEmail, urlsForUser } = require('./helpers');
 const app = express();
 app.set('view engine', 'ejs');
 const PORT = 8080; //default port 8080
@@ -22,54 +23,12 @@ const users = {
 
 };
 
-//Functions
-
-const getRandomChar = (string) => {
-  return Math.floor(Math.random() * string.length);
-};
-
-const generateRandomString = (callback) => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789';
-  let randomString = '';
-  for (let i = 0; i < 6; i++) {
-    randomString += chars[callback(chars)];
-  }
-  return randomString;
-}; // apapted from https://www.coderrocketfuel.com/article/generate-a-random-letter-from-the-alphabet-using-javascript
-
-const validator = (userProperty, reqBody) => { //userProperty should be a property of the reqBody object, ie id or email, reqBody is the req.body object returned from form submission.
-  for (const user in users) {
-    if (reqBody[userProperty] === users[user][userProperty]) {
-      return false;
-    }
-  }
-  return true;
-};
-
-const getUserByEmail = (email, database) => {
-  for (const user in database) {
-    if (email === database[user]['email']) {
-      return database[user]['id'];
-    }
-  }
-};
-
-const urlsForUser = (id) => {
-  const match = {};
-  for (const url in urlDatabase) {
-    if (urlDatabase[url].user === id) {
-      match[url] = urlDatabase[url];
-    }
-  }
-  return match;
-};
-
 //Get routes
 
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase, user: users[req.session.user_id] };
   if (templateVars.user) {
-    templateVars.urls = urlsForUser(templateVars.user['id']); // returns urls that match user id
+    templateVars.urls = urlsForUser(templateVars.user['id'], urlDatabase); // returns urls that match user id
   }
   res.render('urls_index', templateVars);
 });
@@ -92,7 +51,7 @@ app.get("/urls/:shortURL", (req, res) => {
   // console.log(urlsForUser(templateVars.user['id']));
   console.log('urldatabase', urlDatabase);
   console.log('users', users);
-  if (!templateVars.user || !(urlsForUser(templateVars.user['id'])[templateVars.shortURL])) {
+  if (!templateVars.user || !(urlsForUser(templateVars.user['id'], urlDatabase)[templateVars.shortURL])) {
     res.redirect('/login');
     return;
   }
@@ -129,7 +88,7 @@ app.post("/urls", (req, res) => {
 
 //sets cookie on user_id
 app.post('/login', (req, res) => {
-  if (req.body.email && validator('email', req.body)) { //validator returns true if email doesn't match an email in the user object
+  if (req.body.email && validator('email', req.body, users)) { //validator returns true if email doesn't match an email in the user object
     res.sendStatus(403);
     return;
   }
@@ -150,12 +109,12 @@ app.post('/logout', (req, res) => {
 
 // updates users object if email and password aren't empty strings, and email doesn't already exist in users object
 app.post('/register', (req, res) => {
-  if (!req.body['email'] || !req.body['password'] || !validator('email', req.body)) {
+  if (!req.body['email'] || !req.body['password'] || !validator('email', req.body, users)) {
     const templateVars = { user: users[req.session.user_id], valid: false };
     res.render('urls_register', templateVars);
     return;
   }
-  if (validator('email', req.body)) {
+  if (validator('email', req.body, users)) {
     const email = req.body.email;
     const id = generateRandomString(getRandomChar);
     const password = bcrypt.hashSync(req.body.password, 10);
@@ -177,7 +136,7 @@ app.post('/urls/:shortURL/update', (req, res) => {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL] && urlDatabase[req.params.shortURL]['longURL'],
     user: users[req.session.user_id] };
-  if (!vars.user || !(urlsForUser(vars.user['id'])[vars.shortURL])) {
+  if (!vars.user || !(urlsForUser(vars.user['id'], urlDatabase)[vars.shortURL])) {
     res.redirect('/login');
     return;
   }
@@ -191,7 +150,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL] && urlDatabase[req.params.shortURL]['longURL'],
     user: users[req.session.user_id] };
-  if (!vars.user || !(urlsForUser(vars.user['id'])[vars.shortURL])) {
+  if (!vars.user || !(urlsForUser(vars.user['id'], urlDatabase)[vars.shortURL])) {
     res.redirect('/login');
     return;
   }
