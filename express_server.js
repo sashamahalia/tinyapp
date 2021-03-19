@@ -15,6 +15,8 @@ app.use(cookieSession({
   keys: ['key1', 'key2']
 }));
 
+// Databases
+
 const urlDatabase = {
 
 };
@@ -48,7 +50,7 @@ app.get("/urls/:shortURL", (req, res) => {
     longURL: urlDatabase[req.params.shortURL] && urlDatabase[req.params.shortURL]['longURL'],
     user: users[req.session.user_id],
     owner: true
-   };
+  };
   
   if (templateVars.user && !(urlsForUser(templateVars.user['id'], urlDatabase)[templateVars.shortURL])) { //checks if user owns the url based on ID.
     templateVars['owner'] = false;
@@ -78,6 +80,7 @@ app.get('/login', (req, res) => {
   res.render('urls_login', templateVars);
 });
 
+//catch all redirect, if none of the above routes are met.
 app.get('*', (req, res) => {
   const vars = { user: users[req.session.user_id] };
   if (vars.user) {
@@ -103,11 +106,11 @@ app.post('/login', (req, res) => {
   }
   const id = getUserByEmail(req.body.email, users);
   const password = users[id]['password'];
-  if (req.body.password && !bcrypt.compareSync(req.body.password, password)) {
+  if (req.body.password && !bcrypt.compareSync(req.body.password, password)) { //if the passwords don't match, return error.
     res.sendStatus(403);
     return;
   }
-  req.session.user_id = users[id]['id'];
+  req.session.user_id = users[id]['id']; //sets cookie contaning user id
   res.redirect('/urls');
 });
 
@@ -128,7 +131,7 @@ app.post('/register', (req, res) => {
     const id = generateRandomString(getRandomChar);
     const password = bcrypt.hashSync(req.body.password, 10);
     users[id] = { id, email, password };
-    req.session.user_id = id;
+    req.session.user_id = id; //sets cookie containing user id
     res.redirect('/urls');
   }
 });
@@ -152,7 +155,7 @@ app.post('/urls/:shortURL', (req, res) => {
   res.redirect('/urls');
 });
 
-//deletes a shortURl - longURL pair from urlDatabase
+//deletes a shortURl object from urlDatabase
 app.post('/urls/:shortURL/delete', (req, res) => {
   const vars = {
     shortURL: req.params.shortURL,
