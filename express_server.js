@@ -46,10 +46,10 @@ const validator = (userProperty, reqBody) => { //userProperty should be a proper
   return true;
 };
 
-const getUserByEmail = (email) => {
-  for (const user in users) {
-    if (email === users[user]['email']) {
-      return users[user]['id'];
+const getUserByEmail = (email, database) => {
+  for (const user in database) {
+    if (email === database[user]['email']) {
+      return database[user]['id'];
     }
   }
 };
@@ -133,7 +133,7 @@ app.post('/login', (req, res) => {
     res.sendStatus(403);
     return;
   }
-  const id = getUserByEmail(req.body.email);
+  const id = getUserByEmail(req.body.email, users);
   const password = users[id]['password'];
   if (req.body.password && !bcrypt.compareSync(req.body.password, password)) {
     res.sendStatus(403);
