@@ -78,6 +78,15 @@ app.get('/login', (req, res) => {
   res.render('urls_login', templateVars);
 });
 
+app.get('*', (req, res) => {
+  const vars = { user: users[req.session.user_id] };
+  if (vars.user) {
+    res.redirect('/urls');
+    return;
+  }
+  res.redirect('/login');
+});
+
 //Post routes
 
 app.post("/urls", (req, res) => {
