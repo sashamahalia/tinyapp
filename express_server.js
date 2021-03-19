@@ -46,13 +46,13 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL] && urlDatabase[req.params.shortURL]['longURL'],
-    user: users[req.session.user_id] };
-  // console.log(templateVars.user['id']);
-  // console.log(urlsForUser(templateVars.user['id']));
-  console.log('urldatabase', urlDatabase);
-  console.log('users', users);
-  if (!templateVars.user || !(urlsForUser(templateVars.user['id'], urlDatabase)[templateVars.shortURL])) {
-    res.redirect('/login');
+    user: users[req.session.user_id],
+    owner: true
+   };
+  
+  if (templateVars.user && !(urlsForUser(templateVars.user['id'], urlDatabase)[templateVars.shortURL])) { //checks if user owns the url based on ID.
+    templateVars['owner'] = false;
+    res.render("urls_show", templateVars);
     return;
   }
   res.render("urls_show", templateVars);
@@ -129,7 +129,6 @@ app.post('/register', (req, res) => {
     const password = bcrypt.hashSync(req.body.password, 10);
     users[id] = { id, email, password };
     req.session.user_id = id;
-    console.log('user id cookie', req.session.user_id);
     res.redirect('/urls');
   }
 });
